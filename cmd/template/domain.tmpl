@@ -1,0 +1,29 @@
+package domain
+
+import (
+	"context"
+	"time"
+)
+
+type {{ .Name }} struct {
+    {{ range .Fields }}{{ .Name }} {{ .TypeName }} `json:"{{ .JSONName }}"`    
+    {{ end }}	
+}
+
+// {{ .Name }}Usecase represent the {{ .Name }} usecases
+type {{ .Name }}Usecase interface {
+	Fetch(ctx context.Context, cursor string, num int64) ([]{{ .Name }}, string, error)
+	GetByID(ctx context.Context, id int64) ({{ .Name }}, error)
+	Update(ctx context.Context, ar *{{ .Name }}) error
+	Store(context.Context, *{{ .Name }}) error
+	Delete(ctx context.Context, id int64) error
+}
+
+// {{ .Name }}Repository represent the {{ .Name }} repository contract
+type {{ .Name }}Repository interface {
+	Fetch(ctx context.Context, cursor string, num int64) (res []{{ .Name }}, nextCursor string, err error)
+	GetByID(ctx context.Context, id int64) ({{ .Name }}, error)
+	Update(ctx context.Context, ar *{{ .Name }}) error
+	Store(ctx context.Context, a *{{ .Name }}) error
+	Delete(ctx context.Context, id int64) error
+}
