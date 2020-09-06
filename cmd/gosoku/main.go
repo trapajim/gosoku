@@ -15,8 +15,6 @@ limitations under the License.
 */
 package main
 
-import "gosoku/cmd"
-
 func main() {
-	cmd.Execute()
+	rootCmd.Execute()
 }

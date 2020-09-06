@@ -1,0 +1,102 @@
+package repository
+
+import (
+	"context"
+	"database/sql"
+	"fmt"
+  "{{ .Name }}"
+)
+
+
+type psql{{ .Name }}Repo struct {
+	DB *sql.DB
+}
+
+// NewPsql{{ .Name }}Repository
+func NewPsql{{ .Name }}Repository(db *sql.DB) domain.{{ .Name }}Repository {
+	return &psql{{ .Name }}Repo{
+		DB: db,
+	}
+}
+
+func (m *psql{{ .Name }}Repo) Store(ctx context.Context, a *domain.{{ .Name }}) error {
+	query := `INSERT INTO {{ .VarName }}({{ range $i, $a := .Fields }}{{if $i}}, {{end}}{{ $a.JSONName }}{{ end }})
+  VALUES({{ range $i, $a := .Fields }}{{if $i}}, {{end}}${{ add $i }}{{ end }}) RETURNING id`
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	var lastID int64
+  
+	err = stmt.QueryRowContext(ctx, {{ range .Fields }}a.{{ .Name }} ,
+    {{ end }}).Scan(&lastID)
+	if err != nil {
+		return err
+	}
+	a.ID = lastID
+	return nil
+}
+
+func (m *psql{{ .Name }}Repo) Update(ctx context.Context, a *domain.{{ .Name }}) error {
+  {{$count := 0}}
+	query := `UPDATE {{ .VarName }} SET {{ range $i, $a := .Fields }} {{$count = add $i}}{{if $i}}, {{end}}{{ $a.JSONName }}=${{ add $i }}{{ end }} WHERE id=${{add $count}}`
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+
+	res, err := stmt.ExecContext(ctx, {{ range .Fields }}a.{{ .Name }} ,
+    {{ end }} a.ID)
+	if err != nil {
+		return err
+	}
+
+	_, err = res.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (m *psql{{ .Name }}Repo) GetByID(ctx context.Context) (*domain.{{ .Name }}, error) {
+	query := `SELECT * FROM {{ .VarName }} WHERE id !=$1 LIMIT 1`
+	return m.getOne(ctx, query, sender.ID)
+}
+
+
+func (m *psql{{ .Name }}Repo) getOne(ctx context.Context, query string, args ...interface{}) (*domain.{{ .Name }}, error) {
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		logrus.Error(err)
+		return nil, err
+	}
+	row := stmt.QueryRowContext(ctx, args...)
+	a := &domain.{{ .Name }}{}
+
+	err = row.Scan({{ range .Fields }}&a.{{ .Name }},{{ end }} &a.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	return a, nil
+}
+
+func (m *psql{{ .Name }}Repo) Delete(ctx context.Context,  a *domain.{{ .Name }}) error {
+	query := `DELETE FROM {{ .VarName }} WHERE id=$1`
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		fmt.Println(err)
+		return err
+	}
+	var lastID int64
+  
+	err = stmt.QueryRowContext(ctx, a.ID).Scan(&lastID)
+	if err != nil {
+		return err
+	}
+	a.ID = lastID
+	return nil
+}

@@ -1,0 +1,51 @@
+package usecase
+
+import (
+	"context"
+	"time"
+	"{{ .Name }}"
+)
+
+type {{ .VarName }}Usecase struct {
+	{{ .VarName }}Repo    domain.{{ .Name }}Repository
+	contextTimeout time.Duration
+}
+
+func (a *{{ .VarName }}Usecase) GetByID(c context.Context, id int64) (res domain.{{ .Name }}, err error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
+	res, err = a.{{ .VarName }}Repo.GetByID(ctx, id)
+	if err != nil {
+		return
+	}
+	return
+}
+
+func (a *{{ .VarName }}Usecase) Update(c context.Context, ar *domain.{{ .Name }}) (err error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
+	ar.UpdatedAt = time.Now()
+	return a.{{ .VarName }}Repo.Update(ctx, ar)
+}
+
+func (a *{{ .VarName }}Usecase) Store(c context.Context, m *domain.{{ .Name }}) (err error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	err = a.{{ .VarName }}Repo.Store(ctx, m)
+	return
+}
+
+func (a *{{ .VarName }}Usecase) Delete(c context.Context, id int64) (err error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+	existing, err := a.{{ .VarName }}Repo.GetByID(ctx, id)
+	if err != nil {
+		return
+	}
+	if existing == (domain.{{ .Name }}{}) {
+		return domain.ErrNotFound
+	}
+	return a.{{ .VarName }}Repo.Delete(ctx, id)
+}

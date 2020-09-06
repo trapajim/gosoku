@@ -1,4 +1,4 @@
-package cmd
+package main
 
 import (
 	"bytes"
@@ -117,10 +117,6 @@ func generateContentType(args []string) error {
 	appDir := filepath.Join(root, "app")
 	modelsDir := filepath.Join(appDir, "domain")
 	modelsFilePath := filepath.Join(modelsDir, fileName)
-	// check if model exists
-	if _, err := os.Stat(modelsFilePath); !os.IsNotExist(err) {
-		return fmt.Errorf("Please remove '%s' before running this command", modelsFilePath)
-	}
 
 	moduleDir := filepath.Join(appDir, moduleDirName)
 	// check if module exist
@@ -133,9 +129,53 @@ func generateContentType(args []string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to parse type args: %s", err.Error())
 	}
+	tmplPath := filepath.Join(root, "cmd", "gosoku", "template", "domain.tmpl")
+	err = createFile(tmplPath, modelsFilePath, gt)
+	if err != nil {
+		return fmt.Errorf("Failed to parse type args: %s", err.Error())
+	}
+	// create folder
+	directory := filepath.Join(root, "app", moduleDirName)
+	err = os.MkdirAll(directory, 0755)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory: %s", err.Error())
+	}
+	// create repository
+	repositoryPath := filepath.Join(directory, "repository")
+	err = os.MkdirAll(repositoryPath, 0755)
+	tmplPath = filepath.Join(root, "cmd", "gosoku", "template", "repository_psql.tmpl")
+	finalFilePath := filepath.Join(repositoryPath, "repository.go")
+	err = createFile(tmplPath, finalFilePath, gt)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory: %s", err.Error())
+	}
+	// create usecase
+	usecasePath := filepath.Join(directory, "usecase")
+	err = os.MkdirAll(usecasePath, 0755)
+	tmplPath = filepath.Join(root, "cmd", "gosoku", "template", "usecase.tmpl")
+	finalFilePath = filepath.Join(usecasePath, "usecase.go")
+	err = createFile(tmplPath, finalFilePath, gt)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory: %s", err.Error())
+	}
+	return nil
+}
 
-	tmplPath := filepath.Join(root, "cmd", "template", "domain.tmpl")
-	tmpl, err := template.ParseFiles(tmplPath)
+func createFile(tmplPath string, finalFilePath string, gt domain) error {
+	funcMap := template.FuncMap{
+		"add": func(i int) int {
+			return i + 1
+		},
+	}
+	componentPathPieces := strings.Split(tmplPath, "/")
+
+	// Get the last item in the pieces (this should be the file name).
+	componentFileName := componentPathPieces[len(componentPathPieces)-1]
+	tmpl, err := template.New(componentFileName).Funcs(funcMap).ParseFiles(tmplPath)
+
+	if _, err := os.Stat(finalFilePath); !os.IsNotExist(err) {
+		return fmt.Errorf("Please remove '%s' before running this command", finalFilePath)
+	}
 	if err != nil {
 		return fmt.Errorf("Failed to parse template: %s", err.Error())
 	}
@@ -151,7 +191,7 @@ func generateContentType(args []string) error {
 	}
 
 	// create model
-	file, err := os.Create(modelsFilePath)
+	file, err := os.Create(finalFilePath)
 	defer file.Close()
 	if err != nil {
 		return err
@@ -161,13 +201,6 @@ func generateContentType(args []string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to generated file buffer: %s", err.Error())
 	}
-	// create folder
-	directory := filepath.Join(root, "app", moduleDirName)
-	err = os.MkdirAll(directory, 0755)
-	if err != nil {
-		return fmt.Errorf("Failed to create directory: %s", err.Error())
-	}
-
 	return nil
 }
 

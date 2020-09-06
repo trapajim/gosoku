@@ -6,22 +6,23 @@ import (
 )
 
 type {{ .Name }} struct {
+		ID        int64     `json:"id"`
     {{ range .Fields }}{{ .Name }} {{ .TypeName }} `json:"{{ .JSONName }}"`    
-    {{ end }}	
+    {{ end }}
+		UpdatedAt time.Time `json:"updated_at"`
+		CreatedAt time.Time `json:"created_at"`
 }
 
 // {{ .Name }}Usecase represent the {{ .Name }} usecases
 type {{ .Name }}Usecase interface {
-	Fetch(ctx context.Context, cursor string, num int64) ([]{{ .Name }}, string, error)
 	GetByID(ctx context.Context, id int64) ({{ .Name }}, error)
 	Update(ctx context.Context, ar *{{ .Name }}) error
-	Store(context.Context, *{{ .Name }}) error
-	Delete(ctx context.Context, id int64) error
+	Store(context.Context,model *{{ .Name }}) error
+	Delete(ctx context.Context, model *{{ .Name }}) error
 }
 
 // {{ .Name }}Repository represent the {{ .Name }} repository contract
 type {{ .Name }}Repository interface {
-	Fetch(ctx context.Context, cursor string, num int64) (res []{{ .Name }}, nextCursor string, err error)
 	GetByID(ctx context.Context, id int64) ({{ .Name }}, error)
 	Update(ctx context.Context, ar *{{ .Name }}) error
 	Store(ctx context.Context, a *{{ .Name }}) error
