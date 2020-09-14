@@ -15,6 +15,22 @@ limitations under the License.
 */
 package main
 
+import (
+	"fmt"
+
+	"github.com/spf13/viper"
+)
+
 func main() {
+	viper.AddConfigPath(".")
 	rootCmd.Execute()
+}
+
+func getProjectName() string {
+	viper.SetConfigName("config")
+	err := viper.ReadInConfig() // Find and read the config file
+	if err != nil {             // Handle errors reading the config file
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
+	return viper.GetString("name")
 }

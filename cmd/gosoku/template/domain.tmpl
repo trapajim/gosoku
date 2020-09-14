@@ -17,7 +17,7 @@ type {{ .Name }} struct {
 type {{ .Name }}Usecase interface {
 	GetByID(ctx context.Context, id int64) ({{ .Name }}, error)
 	Update(ctx context.Context, ar *{{ .Name }}) error
-	Store(context.Context,model *{{ .Name }}) error
+	Store(ctx context.Context,model *{{ .Name }}) error
 	Delete(ctx context.Context, model *{{ .Name }}) error
 }
 

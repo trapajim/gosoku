@@ -3,12 +3,19 @@ package usecase
 import (
 	"context"
 	"time"
-	"{{ .Name }}"
+	"{{.ProjectName}}/app/domain"
 )
 
 type {{ .VarName }}Usecase struct {
 	{{ .VarName }}Repo    domain.{{ .Name }}Repository
 	contextTimeout time.Duration
+}
+
+func New{{ .Name }}Usecase(repo domain.{{ .Name }}Repository, timeout time.Duration) domain.{{ .Name }}Usecase {
+	return & {{ .VarName }}Usecase{
+		{{ .VarName }}Repo: repo,
+		contextTimeout: timeout,
+	}
 }
 
 func (a *{{ .VarName }}Usecase) GetByID(c context.Context, id int64) (res domain.{{ .Name }}, err error) {
@@ -42,7 +49,7 @@ func (a *{{ .VarName }}Usecase) Delete(c context.Context, id int64) (err error) 
 	defer cancel()
 	existing, err := a.{{ .VarName }}Repo.GetByID(ctx, id)
 	if err != nil {
-		return
+		return err
 	}
 	if existing == (domain.{{ .Name }}{}) {
 		return domain.ErrNotFound

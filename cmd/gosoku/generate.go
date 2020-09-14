@@ -13,9 +13,10 @@ import (
 )
 
 type domain struct {
-	Name    string
-	VarName string
-	Fields  []field
+	Name        string
+	VarName     string
+	ProjectName string // have this here for simplicity
+	Fields      []field
 }
 
 type field struct {
@@ -61,7 +62,8 @@ func getField(s string, domain *domain) (field, error) {
 // User name:string email:string
 func getType(args []string) (domain, error) {
 	t := domain{
-		Name: args[0],
+		Name:        args[0],
+		ProjectName: getProjectName(),
 	}
 	t.VarName = strings.ToLower(t.Name)
 	fields := args[1:]
@@ -104,6 +106,19 @@ func foundReservedFields(fields []field) (bool, map[string]bool) {
 	return true, foundConflicts
 }
 
+func createModuleFiles(moduleDirName, folder, fileName, template string, gt domain) error {
+	root, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	directory := filepath.Join(root, "app", moduleDirName)
+	path := filepath.Join(directory, folder)
+	err = os.MkdirAll(path, 0755)
+	tmplPath := filepath.Join(root, "cmd", "gosoku", "template", template)
+	finalFilePath := filepath.Join(path, fileName)
+	err = createFile(tmplPath, finalFilePath, gt)
+	return err
+}
 func generateContentType(args []string) error {
 	name := args[0]
 	moduleDirName := strings.ToLower(name)
@@ -132,7 +147,7 @@ func generateContentType(args []string) error {
 	tmplPath := filepath.Join(root, "cmd", "gosoku", "template", "domain.tmpl")
 	err = createFile(tmplPath, modelsFilePath, gt)
 	if err != nil {
-		return fmt.Errorf("Failed to parse type args: %s", err.Error())
+		return fmt.Errorf("Failed to parse domain template: %s", err.Error())
 	}
 	// create folder
 	directory := filepath.Join(root, "app", moduleDirName)
@@ -141,20 +156,17 @@ func generateContentType(args []string) error {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}
 	// create repository
-	repositoryPath := filepath.Join(directory, "repository")
-	err = os.MkdirAll(repositoryPath, 0755)
-	tmplPath = filepath.Join(root, "cmd", "gosoku", "template", "repository_psql.tmpl")
-	finalFilePath := filepath.Join(repositoryPath, "repository.go")
-	err = createFile(tmplPath, finalFilePath, gt)
+	err = createModuleFiles(moduleDirName, "repository", "repository.go", "repository_psql.tmpl", gt)
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}
 	// create usecase
-	usecasePath := filepath.Join(directory, "usecase")
-	err = os.MkdirAll(usecasePath, 0755)
-	tmplPath = filepath.Join(root, "cmd", "gosoku", "template", "usecase.tmpl")
-	finalFilePath = filepath.Join(usecasePath, "usecase.go")
-	err = createFile(tmplPath, finalFilePath, gt)
+	err = createModuleFiles(moduleDirName, "usecase", "usecase.go", "usecase.tmpl", gt)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory: %s", err.Error())
+	}
+	// create delivery josn
+	err = createModuleFiles(moduleDirName, "delivery", "json.go", "delivery_json.tmpl", gt)
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}
