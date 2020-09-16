@@ -144,14 +144,15 @@ func generateContentType(args []string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to parse type args: %s", err.Error())
 	}
+	// create the domain
 	tmplPath := filepath.Join(root, "cmd", "gosoku", "template", "domain.tmpl")
 	err = createFile(tmplPath, modelsFilePath, gt)
 	if err != nil {
 		return fmt.Errorf("Failed to parse domain template: %s", err.Error())
 	}
 	// create folder
-	directory := filepath.Join(root, "app", moduleDirName)
-	err = os.MkdirAll(directory, 0755)
+	moduleDirectoryPath := filepath.Join(root, "app", moduleDirName)
+	err = os.MkdirAll(moduleDirectoryPath, 0755)
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}
@@ -165,7 +166,7 @@ func generateContentType(args []string) error {
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}
-	// create delivery josn
+	// create delivery json
 	err = createModuleFiles(moduleDirName, "delivery", "json.go", "delivery_json.tmpl", gt)
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
