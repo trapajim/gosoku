@@ -119,6 +119,18 @@ func createModuleFiles(moduleDirName, folder, fileName, template string, gt doma
 	err = createFile(tmplPath, finalFilePath, gt)
 	return err
 }
+func createRoute(fileName, template string, gt domain) error {
+	root, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+	path := filepath.Join(root, "system", "router")
+	err = os.MkdirAll(path, 0755)
+	tmplPath := filepath.Join(root, "cmd", "gosoku", "template", template)
+	finalFilePath := filepath.Join(path, fileName)
+	err = createFile(tmplPath, finalFilePath, gt)
+	return err
+}
 func generateContentType(args []string) error {
 	name := args[0]
 	moduleDirName := strings.ToLower(name)
@@ -168,6 +180,11 @@ func generateContentType(args []string) error {
 	}
 	// create delivery json
 	err = createModuleFiles(moduleDirName, "delivery", "json.go", "delivery_json.tmpl", gt)
+	if err != nil {
+		return fmt.Errorf("Failed to create directory: %s", err.Error())
+	}
+
+	err = createRoute(gt.VarName+".go", "route_init.tmpl", gt)
 	if err != nil {
 		return fmt.Errorf("Failed to create directory: %s", err.Error())
 	}

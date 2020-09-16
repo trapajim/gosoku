@@ -1,0 +1,11 @@
+package router
+import (
+    "{{.ProjectName}}/app/{{ .VarName }}/repository"
+    "{{.ProjectName}}/app/{{ .VarName }}/usecase"
+    "{{.ProjectName}}/app/{{ .VarName }}/delivery"
+)
+func RegisterRouteFor{{ .Name }}() {
+    {{ .VarName }}Repo := NewPsql{{ .Name }}Repository(dbConn)
+    {{ .VarName }}Usecase := New{{ .Name }}Usecase(userRepo, timeoutContext)
+    New{{ .Name }}Handler(e,  {{ .VarName }}Usecase)
+}
