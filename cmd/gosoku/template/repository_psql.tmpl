@@ -70,7 +70,6 @@ func (m *psql{{ .Name }}Repo) GetByID(ctx context.Context,  id int64) (*domain.{
 func (m *psql{{ .Name }}Repo) getOne(ctx context.Context, query string, args ...interface{}) (*domain.{{ .Name }}, error) {
 	stmt, err := m.DB.PrepareContext(ctx, query)
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
 	row := stmt.QueryRowContext(ctx, args...)
