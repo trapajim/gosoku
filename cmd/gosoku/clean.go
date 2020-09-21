@@ -28,7 +28,7 @@ func removeFolders(args []string) error {
 var cleanCmd = &cobra.Command{
 	Use:     "clean <namespace>",
 	Aliases: []string{"c"},
-	Short:   "removes the given domain type and its routes",
+	Short:   "removes the given domain type and it's routes",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return removeFolders(args)
 	},
