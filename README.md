@@ -30,4 +30,21 @@ app
             repository.go
         usecase # business logic here
             usecase.go 
+system
+    router
+        user.go
+```
+
+*clean*
+remove a generated type
+
+```bash
+    # example
+<<<<<<< HEAD
+    gosoku clean user
+    #or 
+=======
+>>>>>>> 5c3bd5a... updated readme.md
+    gosoku c user 
+    # this will remove domain/user.go, router/user.go and the user directory
 ```
