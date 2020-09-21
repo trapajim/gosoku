@@ -1,12 +1,14 @@
 package main
 
-import "gosoku/system/router"
+import (
+	"gosoku/system/router"
+)
 
 func main() {
 	/* dbHost := viper.GetString(`database.host`)
 	dbPort := viper.GetString(`database.port`)
 	dbUser := viper.GetString(`database.user`)
-	dbPass := viper.GetString(`database.pass`)
+	dbPass := viper.GetString(`database.password`)
 	dbName := viper.GetString(`database.name`)
 	connection := fmt.Sprintf("host=%s port=%s user=%s "+
 		"password=%s dbname=%s sslmode=disable",

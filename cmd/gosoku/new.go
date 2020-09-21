@@ -14,6 +14,14 @@ import (
 	"github.com/spf13/viper"
 )
 
+type dBData struct {
+	Port     int
+	Host     string
+	User     string
+	Password string
+	DbName   string
+}
+
 var newCmd = &cobra.Command{
 	Use:     "new [flags] <project name>",
 	Short:   "creates a project directory of the name supplied as a parameter",
@@ -29,6 +37,45 @@ var newCmd = &cobra.Command{
 	},
 }
 
+func scanDatabaseData(projectName string) dBData {
+	db := dBData{}
+	fmt.Println(projectName)
+	fmt.Println(string("\033[36m"), "******************")
+	fmt.Println("", "*DB Configuration*")
+	fmt.Println("", "******************", string("\033[0m"))
+	fmt.Print("Port (default 5432):")
+	fmt.Scanln(&db.Port)
+	if db.Port == 0 {
+		db.Port = 5432
+	}
+	fmt.Print("Host (default localhost):")
+	fmt.Scanln(&db.Host)
+	if db.Host == "" {
+		db.Host = "localhost"
+	}
+	fmt.Printf("Database name (default %s):", projectName)
+	fmt.Scanln(&db.DbName)
+	if db.DbName == "" {
+		db.DbName = projectName
+	}
+	fmt.Printf("User (default %s):", projectName)
+	fmt.Scanln(&db.User)
+	if db.User == "" {
+		db.User = projectName
+	}
+	scanPassword(&db)
+	return db
+}
+
+func scanPassword(db *dBData) {
+	fmt.Print("Password:")
+	fmt.Scanln(&db.Password)
+	if db.Password == "" {
+		fmt.Println(string("\033[31m"), "Password can't be empty", string("\033[0m"))
+		scanPassword(db)
+	}
+}
+
 func createProject(projectName string) error {
 	renameModule(projectName)
 	err := createDirectory()
@@ -39,7 +86,9 @@ func createProject(projectName string) error {
 	if err != nil {
 		return err
 	}
-	createConfigYml(projectName)
+	data := scanDatabaseData(projectName)
+	fmt.Println(data)
+	createConfigYml(projectName, data)
 	return nil
 }
 
@@ -54,9 +103,10 @@ func createDirectory() error {
 	return err
 }
 
-func createConfigYml(projectName string) {
+func createConfigYml(projectName string, db dBData) {
 	viper.SetConfigName("config")
 	viper.SetDefault("name", projectName)
+	viper.SetDefault("database", db)
 	err := viper.WriteConfig()
 	fmt.Println(err)
 }
