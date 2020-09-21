@@ -4,8 +4,8 @@ import (
     "{{.ProjectName}}/app/{{ .VarName }}/usecase"
     "{{.ProjectName}}/app/{{ .VarName }}/delivery"
 )
-func RegisterRouteFor{{ .Name }}() {
-    {{ .VarName }}Repo := NewPsql{{ .Name }}Repository(dbConn)
-    {{ .VarName }}Usecase := New{{ .Name }}Usecase(userRepo, timeoutContext)
-    New{{ .Name }}Handler(e,  {{ .VarName }}Usecase)
+func (r *Router) RegisterRouteFor{{ .Name }}() {
+    {{ .VarName }}Repo := repository.NewPsql{{ .Name }}Repository(r.DBConn)
+    {{ .VarName }}Usecase := usecase.New{{ .Name }}Usecase(userRepo, timeoutContext)
+    delivery.New{{ .Name }}Handler(r.Echo,  {{ .VarName }}Usecase)
 }

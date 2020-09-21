@@ -1,6 +1,7 @@
 package router
 
 import (
+	"database/sql"
 	"fmt"
 	"reflect"
 	"strings"
@@ -10,13 +11,15 @@ import (
 
 // Router handles all the routes of the API
 type Router struct {
-	Echo *echo.Echo
+	Echo   *echo.Echo
+	DBConn *sql.DB
 }
 
 //NewRouter initialises the router
-func NewRouter() Router {
+func NewRouter(db *sql.DB) Router {
 	return Router{
 		Echo: echo.New(),
+		DBConn: db
 	}
 }
 
@@ -27,14 +30,14 @@ func (r *Router) Start() {
 }
 
 func (r *Router) registerRoutes() {
-	fooType := reflect.TypeOf(r)
-	fooVal := reflect.ValueOf(r)
+	method := reflect.TypeOf(r)
+	val := reflect.ValueOf(r)
 	fmt.Println("--- Registering Routes ---")
-	for i := 0; i < fooType.NumMethod(); i++ {
-		method := fooType.Method(i)
+	for i := 0; i < method.NumMethod(); i++ {
+		method := method.Method(i)
 		if strings.Contains(method.Name, "RegisterRouteFor") {
 			fmt.Println(strings.Replace(method.Name, "RegisterRouteFor", "", 1))
-			method.Func.Call([]reflect.Value{fooVal})
+			method.Func.Call([]reflect.Value{val})
 		}
 	}
 }
