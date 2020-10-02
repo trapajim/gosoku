@@ -18,8 +18,8 @@ type {{ .Name }}JSONHandler struct {
 	{{ .Name }}Usecase domain.{{ .Name }}Usecase
 }
 
-//NewUserHandler initialises the user routes
-func NewUserHandler(e *echo.Echo, usecase domain.{{ .Name }}Usecase) {
+//New{{ .Name }}Handler initialises the {{ .Name }} routes
+func New{{ .Name }}Handler(e *echo.Echo, usecase domain.{{ .Name }}Usecase) {
 	handler := &{{ .Name }}JSONHandler{
 		{{ .Name }}Usecase: usecase,
 	}
@@ -50,7 +50,7 @@ func (handler *{{ .Name }}JSONHandler) New{{ .Name }}(c echo.Context) error {
 func (handler *{{ .Name }}JSONHandler) Get{{ .Name }}(c echo.Context) error {
 	uuid := c.Param("id")
     id, err := strconv.ParseInt(uuid, 10, 64)
-    if err == nil {
+    if err != nil {
 		return c.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
 	}    
 	ctx := c.Request().Context()

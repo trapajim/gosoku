@@ -5,21 +5,24 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	"github.com/labstack/echo"
 )
 
 // Router handles all the routes of the API
 type Router struct {
-	Echo   *echo.Echo
-	DBConn *sql.DB
+	Echo    *echo.Echo
+	DBConn  *sql.DB
+	Timeout time.Duration
 }
 
 //NewRouter initialises the router
-func NewRouter(db *sql.DB) Router {
+func NewRouter(db *sql.DB, duration time.Duration) Router {
 	return Router{
-		Echo: echo.New(),
-		DBConn: db
+		Echo:    echo.New(),
+		DBConn:  db,
+		Timeout: duration,
 	}
 }
 

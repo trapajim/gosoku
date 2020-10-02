@@ -6,6 +6,6 @@ import (
 )
 func (r *Router) RegisterRouteFor{{ .Name }}() {
     {{ .VarName }}Repo := repository.NewPsql{{ .Name }}Repository(r.DBConn)
-    {{ .VarName }}Usecase := usecase.New{{ .Name }}Usecase(userRepo, timeoutContext)
+    {{ .VarName }}Usecase := usecase.New{{ .Name }}Usecase( {{ .VarName }}Repo, r.Timeout)
     delivery.New{{ .Name }}Handler(r.Echo,  {{ .VarName }}Usecase)
 }
