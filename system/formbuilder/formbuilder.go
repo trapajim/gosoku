@@ -1,4 +1,4 @@
-package formgenerator
+package formbuilder
 
 import (
 	"fmt"
@@ -10,9 +10,9 @@ import (
 
 const tagName = "form"
 
-// Create creates a new form
-func Create(model interface{}) {
-	elements := getGenerators(model)
+// Build creates a new form
+func Build(model interface{}) {
+	elements := getBuilder(model)
 	form := `<form>
 	{{ range $key, $value := . }} {{$value.HTML | safeHTML}} {{end}}
 	</form>`
@@ -28,26 +28,26 @@ func Create(model interface{}) {
 
 }
 
-// FormElementGenerator is the interface which wraps the basic Generate method.
-type FormElementGenerator interface {
+// FormElementBuilder is the interface which wraps the basic Generate method.
+type FormElementBuilder interface {
 	generate() (string, error)
 	getHTML() string
 }
 
-// DefaultGenerator does not perform any generation.
-type DefaultGenerator struct {
+// DefaultBuilder does not perform any generation.
+type DefaultBuilder struct {
 }
 
-func (g DefaultGenerator) generate() (string, error) {
+func (g DefaultBuilder) generate() (string, error) {
 	return "", nil
 }
-func (g DefaultGenerator) getHTML() string {
+func (g DefaultBuilder) getHTML() string {
 	return ""
 }
 
-// Performs actual data validation using validator definitions on the struct
-func getGenerators(s interface{}) []FormElementGenerator {
-	var generators []FormElementGenerator
+// Performs actual generation of the form
+func getBuilder(s interface{}) []FormElementBuilder {
+	var builders []FormElementBuilder
 	// ValueOf returns a Value representing the run-time data
 	v := reflect.ValueOf(s)
 	for i := 0; i < v.NumField(); i++ {
@@ -59,33 +59,33 @@ func getGenerators(s interface{}) []FormElementGenerator {
 			continue
 		}
 
-		// Get a validator that corresponds to a tag
-		generator := getValidatorFromTag(tag)
+		// Get a builder that corresponds to a tag
+		builder := getBuilderFromTag(tag)
 
 		// Append error to results
-		if generator.getHTML() != "" {
-			generators = append(generators, generator)
+		if builder.getHTML() != "" {
+			builders = append(builders, builder)
 		}
 	}
 
-	return generators
+	return builders
 }
 
-func getValidatorFromTag(tag string) FormElementGenerator {
+func getBuilderFromTag(tag string) FormElementBuilder {
 	args := strings.Split(tag, ",")
 	switch args[0] {
 	case "input":
 		var inputType, inputName string
 		fmt.Sscanf(strings.Join(args[1:], " "), "type=%s name=%s", &inputType, &inputName)
-		generator := NewInput(inputType, inputName)
-		return generator
+		builder := NewInput(inputType, inputName)
+		return builder
 	case "textarea":
 		var textareaName string
 		fmt.Sscanf(strings.Join(args[1:], " "), "name=%s", &textareaName)
-		generator := NewTextarea(textareaName)
+		builder := NewTextarea(textareaName)
 
-		return generator
+		return builder
 	}
 
-	return DefaultGenerator{}
+	return DefaultBuilder{}
 }

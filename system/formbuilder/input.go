@@ -1,20 +1,20 @@
-package formgenerator
+package formbuilder
 
 import (
 	"bytes"
 	"html/template"
 )
 
-// InputGenerator generates input fields for the a form
-type InputGenerator struct {
+// InputBuilder generates input fields for the a form
+type InputBuilder struct {
 	Type string
 	Name string
 	HTML string
 }
 
 // NewInput generates a new Input element for the form
-func NewInput(inputType, name string) InputGenerator {
-	i := InputGenerator{Name: name, Type: inputType}
+func NewInput(inputType, name string) InputBuilder {
+	i := InputBuilder{Name: name, Type: inputType}
 	html, err := i.generate()
 	if err != nil {
 		panic(err)
@@ -24,7 +24,7 @@ func NewInput(inputType, name string) InputGenerator {
 }
 
 // Generate creates a template for input fields
-func (g InputGenerator) generate() (string, error) {
+func (g InputBuilder) generate() (string, error) {
 	t, err := template.New("input").Parse(`<input type="{{.Type}}" name="{{.Name}}" />`)
 	if err != nil {
 		return "", err
@@ -37,6 +37,6 @@ func (g InputGenerator) generate() (string, error) {
 	return buf.String(), nil
 }
 
-func (g InputGenerator) getHTML() string {
+func (g InputBuilder) getHTML() string {
 	return g.HTML
 }

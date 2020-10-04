@@ -1,4 +1,4 @@
-package formgenerator
+package formbuilder
 
 import (
 	"bytes"
@@ -6,14 +6,14 @@ import (
 )
 
 // TextareaGenerator generates Textareas for a form
-type TextareaGenerator struct {
+type TextareaBuilder struct {
 	Name string
 	HTML string
 }
 
 // NewTextarea generates a new Textarea for the form
-func NewTextarea(name string) TextareaGenerator {
-	i := TextareaGenerator{Name: name}
+func NewTextarea(name string) TextareaBuilder {
+	i := TextareaBuilder{Name: name}
 	html, err := i.generate()
 	if err != nil {
 		panic(err)
@@ -23,7 +23,7 @@ func NewTextarea(name string) TextareaGenerator {
 }
 
 // Generate creates a template for input fields
-func (g TextareaGenerator) generate() (string, error) {
+func (g TextareaBuilder) generate() (string, error) {
 	t, err := template.New("input").Parse(`<textarea name="{{.Name}}"></textarea>`)
 	if err != nil {
 		return "", err
@@ -36,6 +36,6 @@ func (g TextareaGenerator) generate() (string, error) {
 	return buf.String(), nil
 }
 
-func (g TextareaGenerator) getHTML() string {
+func (g TextareaBuilder) getHTML() string {
 	return g.HTML
 }
