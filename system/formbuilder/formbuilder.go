@@ -1,9 +1,10 @@
 package formbuilder
 
 import (
+	"bytes"
+	"errors"
 	"fmt"
 	"html/template"
-	"os"
 	"reflect"
 	"strings"
 )
@@ -11,21 +12,27 @@ import (
 const tagName = "form"
 
 // Build creates a new form
-func Build(model interface{}) {
+func Build(model interface{}) (string, error) {
+	if model == nil {
+		return "", errors.New("Not a valid struct")
+	}
 	elements := getBuilder(model)
-	form := `<form>
-	{{ range $key, $value := . }} {{$value.HTML | safeHTML}} {{end}}
-	</form>`
+	if len(elements) == 0 {
+		return "", nil
+	}
+	form := `<form>{{ range $key, $value := . }} {{$value.HTML | safeHTML}} {{end}}</form>`
 
 	t := template.Must(template.New("base").Funcs(template.FuncMap{
 		"safeHTML": func(b string) template.HTML {
 			return template.HTML(b)
 		},
 	}).Parse(form))
-
-	err := t.Execute(os.Stdout, elements)
-	fmt.Println(err)
-
+	buf := new(bytes.Buffer)
+	err := t.Execute(buf, elements)
+	if err != nil {
+		return "", err
+	}
+	return buf.String(), nil
 }
 
 // FormElementBuilder is the interface which wraps the basic Generate method.
