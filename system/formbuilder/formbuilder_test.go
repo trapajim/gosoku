@@ -16,6 +16,9 @@ type TestStructWithTextArea struct {
 	a string `form:"input,type=text,name=a"`
 	b string `form:"textarea,name=a"`
 }
+type TestStructInvalidFormType struct {
+	a string `form:"invalid,type=text,name=a"`
+}
 
 func TestBuild(t *testing.T) {
 	type args struct {
@@ -29,8 +32,9 @@ func TestBuild(t *testing.T) {
 	}{
 		{"check form with input text", args{model: TestStruct{}}, `<form> <input type="text" name="a" /> </form>`, false},
 		{"check form with input text and textarea", args{model: TestStructWithTextArea{}}, `<form> <input type="text" name="a" />  <textarea name="a"></textarea> </form>`, false},
-		{"check form with input text and textarea", args{model: nil}, ``, true},
-		{"check form with input text and textarea", args{model: TestStructNoTags{}}, ``, false},
+		{"pass nil", args{model: nil}, ``, true},
+		{"struct without tags", args{model: TestStructNoTags{}}, ``, false},
+		{"invalid form type", args{model: TestStructInvalidFormType{}}, ``, false},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
