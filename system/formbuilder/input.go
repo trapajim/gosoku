@@ -7,14 +7,15 @@ import (
 
 // InputBuilder generates input fields for the a form
 type InputBuilder struct {
-	Type string
-	Name string
-	HTML string
+	Type  string
+	Name  string
+	Value string
+	HTML  string
 }
 
 // NewInput generates a new Input element for the form
-func NewInput(inputType, name string) InputBuilder {
-	i := InputBuilder{Name: name, Type: inputType}
+func NewInput(inputType, name, value string) InputBuilder {
+	i := InputBuilder{Name: name, Type: inputType, Value: value}
 	html, err := i.generate()
 	if err != nil {
 		panic(err)
@@ -25,7 +26,7 @@ func NewInput(inputType, name string) InputBuilder {
 
 // Generate creates a template for input fields
 func (g InputBuilder) generate() (string, error) {
-	t, err := template.New("input").Parse(`<input type="{{.Type}}" name="{{.Name}}" />`)
+	t, err := template.New("input").Parse(`<input type="{{.Type}}" name="{{.Name}}" value="{{.Value}}"/>`)
 	if err != nil {
 		return "", err
 	}

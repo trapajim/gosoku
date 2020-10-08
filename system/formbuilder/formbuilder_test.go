@@ -6,18 +6,18 @@ import (
 )
 
 type TestStruct struct {
-	a string `form:"input,type=text,name=a"`
+	A string `form:"input,type=text,name=a"`
 }
 type TestStructNoTags struct {
-	a string
+	A string
 }
 
 type TestStructWithTextArea struct {
-	a string `form:"input,type=text,name=a"`
-	b string `form:"textarea,name=a"`
+	A string `form:"input,type=text,name=a"`
+	B string `form:"textarea,name=a"`
 }
 type TestStructInvalidFormType struct {
-	a string `form:"invalid,type=text,name=a"`
+	A string `form:"invalid,type=text,name=a"`
 }
 
 func TestBuild(t *testing.T) {
@@ -30,8 +30,10 @@ func TestBuild(t *testing.T) {
 		want    string
 		wantErr bool
 	}{
-		{"check form with input text", args{model: TestStruct{}}, `<form> <input type="text" name="a" /> </form>`, false},
-		{"check form with input text and textarea", args{model: TestStructWithTextArea{}}, `<form> <input type="text" name="a" />  <textarea name="a"></textarea> </form>`, false},
+		{"check form with input text", args{model: TestStruct{}}, `<form> <input type="text" name="a" value=""/> </form>`, false},
+		{"check form with input text and value", args{model: TestStruct{A: "hello"}}, `<form> <input type="text" name="a" value="hello"/> </form>`, false},
+		{"check form with input text textarea and value value", args{model: TestStructWithTextArea{A: "hello", B: "world"}}, `<form> <input type="text" name="a" value="hello"/>  <textarea name="a">world</textarea> </form>`, false},
+		{"check form with input text and textarea", args{model: TestStructWithTextArea{}}, `<form> <input type="text" name="a" value=""/>  <textarea name="a"></textarea> </form>`, false},
 		{"pass nil", args{model: nil}, ``, true},
 		{"struct without tags", args{model: TestStructNoTags{}}, ``, false},
 		{"invalid form type", args{model: TestStructInvalidFormType{}}, ``, false},

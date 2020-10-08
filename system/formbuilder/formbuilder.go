@@ -67,7 +67,8 @@ func getBuilder(s interface{}) []FormElementBuilder {
 		}
 
 		// Get a builder that corresponds to a tag
-		builder := getBuilderFromTag(tag)
+		value := fmt.Sprintf("%v", v.Field(i).Interface())
+		builder := getBuilderFromTag(tag, value)
 
 		// Append error to results
 		if builder.getHTML() != "" {
@@ -78,18 +79,18 @@ func getBuilder(s interface{}) []FormElementBuilder {
 	return builders
 }
 
-func getBuilderFromTag(tag string) FormElementBuilder {
+func getBuilderFromTag(tag, value string) FormElementBuilder {
 	args := strings.Split(tag, ",")
 	switch args[0] {
 	case "input":
 		var inputType, inputName string
 		fmt.Sscanf(strings.Join(args[1:], " "), "type=%s name=%s", &inputType, &inputName)
-		builder := NewInput(inputType, inputName)
+		builder := NewInput(inputType, inputName, value)
 		return builder
 	case "textarea":
 		var textareaName string
 		fmt.Sscanf(strings.Join(args[1:], " "), "name=%s", &textareaName)
-		builder := NewTextarea(textareaName)
+		builder := NewTextarea(textareaName, value)
 
 		return builder
 	}

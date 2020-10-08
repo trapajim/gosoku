@@ -5,15 +5,16 @@ import (
 	"html/template"
 )
 
-// TextareaGenerator generates Textareas for a form
+// TextareaBuilder generates Textareas for a form
 type TextareaBuilder struct {
-	Name string
-	HTML string
+	Name  string
+	Value string
+	HTML  string
 }
 
 // NewTextarea generates a new Textarea for the form
-func NewTextarea(name string) TextareaBuilder {
-	i := TextareaBuilder{Name: name}
+func NewTextarea(name, value string) TextareaBuilder {
+	i := TextareaBuilder{Name: name, Value: value}
 	html, err := i.generate()
 	if err != nil {
 		panic(err)
@@ -24,7 +25,7 @@ func NewTextarea(name string) TextareaBuilder {
 
 // Generate creates a template for input fields
 func (g TextareaBuilder) generate() (string, error) {
-	t, err := template.New("input").Parse(`<textarea name="{{.Name}}"></textarea>`)
+	t, err := template.New("input").Parse(`<textarea name="{{.Name}}">{{.Value}}</textarea>`)
 	if err != nil {
 		return "", err
 	}
