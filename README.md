@@ -16,6 +16,9 @@ setup a new project
 ```bash
     # example
     gosoku g s User Name:string Age:int
+    # default the form builder tags are set automatically to input fields
+    # if you would like to change that you can append a supported form type after the datatype
+    gosoku g s User Name:string:textarea Age:int
 ```
 
 the above command will generate following structure
@@ -44,4 +47,23 @@ remove a generated type
     #or 
     gosoku c user 
     # this will remove domain/user.go, router/user.go and the user directory
+```
+
+## Formbuilder
+
+Forms can be automatically created based on struct tags.
+
+**example**
+
+```go
+type User struct {
+	Name      string    `json:"name" form:"input,type=text,name=Name"`
+	Biography string    `json:"biography" form:"textarea,name=Biography"`
+}
+
+// this will generate a html form with an input text field and a textarea
+formbuilder.Build(domain.User{})
+
+// the generated form will have the values set from fields.
+formbuilder.Build(domain.User{Name:"Gosoku", Biography: "Test"})
 ```
