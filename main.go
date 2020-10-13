@@ -3,8 +3,6 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	"gosoku/app/domain"
-	"gosoku/system/formgenerator"
 	"gosoku/system/router"
 	"time"
 
@@ -37,7 +35,6 @@ func main() {
 		panic(err)
 	}
 	timeoutContext := time.Duration(viper.GetInt("context.timeout")) * time.Second
-	formgenerator.Create(domain.Users{})
 	router := router.NewRouter(dbConn, timeoutContext)
 	router.Start()
 
