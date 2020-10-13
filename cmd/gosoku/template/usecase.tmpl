@@ -18,6 +18,17 @@ func New{{ .Name }}Usecase(repo domain.{{ .Name }}Repository, timeout time.Durat
 	}
 }
 
+func (a *{{ .VarName }}Usecase) All(c context.Context, page int) (*[]domain.{{ .Name }}, error) {
+	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
+	defer cancel()
+
+	res, err := a.{{ .VarName }}Repo.All(ctx, page)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
 func (a *{{ .VarName }}Usecase) GetByID(c context.Context, id int64) (*domain.{{ .Name }}, error) {
 	ctx, cancel := context.WithTimeout(c, a.contextTimeout)
 	defer cancel()
@@ -53,3 +64,4 @@ func (a *{{ .VarName }}Usecase) Delete(c context.Context, id int64) error {
 	}
 	return a.{{ .VarName }}Repo.Delete(ctx, id)
 }
+

@@ -97,3 +97,26 @@ func (m *psql{{ .Name }}Repo) Delete(ctx context.Context,  id int64) error {
 	}
 	return nil
 }
+
+func (m *psql{{ .Name }}Repo) List(ctx context.Context, page int) (*[]domain.{{ .Name }}, error) {
+	limit := 10
+	offset := limit * (page - 1)
+
+	query := `SELECT * FROM {{ .VarName }} ORDER BY "id" LIMIT $2 OFFSET $1`
+
+	stmt, err := m.DB.PrepareContext(ctx, query)
+	if err != nil {
+		return nil, err
+	}
+	rows, _ := stmt.QueryContext(ctx, limit, offset)
+	var result []domain.{{ .Name }}
+	for rows.Next() {
+		a := domain.{{ .Name }}{}
+		err = rows.Scan(&a.ID, {{ range .Fields }}&a.{{ .Name }},{{ end }})
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, a)
+	}
+	return &result, nil
+}

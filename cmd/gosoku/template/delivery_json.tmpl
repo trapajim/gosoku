@@ -24,9 +24,11 @@ func New{{ .Name }}Handler(e *echo.Echo, usecase domain.{{ .Name }}Usecase) {
 		{{ .Name }}Usecase: usecase,
 	}
     g := e.Group("/{{ .VarName }}")
+	g.Get("/all",handler.All)
     g.GET("/:id", handler.Get{{ .Name }})
 	g.POST("/", handler.New{{ .Name }})
     g.DELETE("/:id", handler.Delete{{ .Name }})
+	
    // e.PUT("/:id")
 }
 
@@ -59,6 +61,24 @@ func (handler *{{ .Name }}JSONHandler) Get{{ .Name }}(c echo.Context) error {
 	}
 
 	model, err := handler.{{ .Name }}Usecase.GetByID(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, model)
+}
+
+// Get{{ .Name }} fetches the {{ .Name }} with given id
+func (handler *{{ .Name }}JSONHandler) All(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+    if page == 0 {
+		page = 1
+	}  
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	model, err := handler.{{ .Name }}Usecase.All(ctx, page)
 	if err != nil {
 		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
 	}

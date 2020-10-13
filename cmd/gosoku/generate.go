@@ -20,11 +20,12 @@ type domain struct {
 }
 
 type field struct {
-	Name     string
-	VarName  string
-	TypeName string
-	JSONName string
-	EditType string
+	Name                  string
+	VarName               string
+	TypeName              string
+	JSONName              string
+	FormElement           string
+	FormElementAttributes string
 }
 
 var reservedFields = map[string]string{
@@ -52,9 +53,11 @@ func getField(s string, domain *domain) (field, error) {
 		JSONName: jsonName(data[0]),
 		TypeName: data[1],
 	}
-	f.EditType = "input"
+	f.FormElement = "input"
+	f.FormElementAttributes = "type=text,name=" + domain.VarName
 	if len(data) > 2 {
-		f.EditType = data[2]
+		f.FormElement = data[2]
+		f.FormElementAttributes = "name=" + domain.VarName
 	}
 	return f, nil
 }
