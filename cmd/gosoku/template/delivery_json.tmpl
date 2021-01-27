@@ -1,0 +1,123 @@
+package delivery
+
+import (
+    "net/http"
+    "context"
+    "{{.ProjectName}}/app/domain"
+	"strconv"
+	"github.com/labstack/echo/v4"
+)
+
+// ResponseError represent the reseponse error struct
+type ResponseError struct {
+	Message string `json:"message"`
+}
+
+// {{ .Name }}JSONHandler  represent the httphandler for user
+type {{ .Name }}JSONHandler struct {
+	{{ .Name }}Usecase domain.{{ .Name }}Usecase
+}
+
+//New{{ .Name }}Handler initialises the {{ .Name }} routes
+func New{{ .Name }}Handler(e *echo.Echo, usecase domain.{{ .Name }}Usecase) {
+	handler := &{{ .Name }}JSONHandler{
+		{{ .Name }}Usecase: usecase,
+	}
+    g := e.Group("/{{ .VarName }}")
+	g.Get("/all",handler.All)
+    g.GET("/:id", handler.Get{{ .Name }})
+	g.POST("/", handler.New{{ .Name }})
+    g.DELETE("/:id", handler.Delete{{ .Name }})
+	
+   // e.PUT("/:id")
+}
+
+// New{{ .Name }} creates a new {{ .Name }}
+func (handler *{{ .Name }}JSONHandler) New{{ .Name }}(c echo.Context) error {
+	{{ .VarName }} := &domain.{{ .Name }}{}
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err := handler.{{ .Name }}Usecase.Store(ctx, {{ .VarName }})
+
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusCreated, {{ .VarName }})
+}
+
+// Get{{ .Name }} fetches the {{ .Name }} with given id
+func (handler *{{ .Name }}JSONHandler) Get{{ .Name }}(c echo.Context) error {
+	uuid := c.Param("id")
+    id, err := strconv.ParseInt(uuid, 10, 64)
+    if err != nil {
+		return c.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
+	}    
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	model, err := handler.{{ .Name }}Usecase.GetByID(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, model)
+}
+
+// Get{{ .Name }} fetches the {{ .Name }} with given id
+func (handler *{{ .Name }}JSONHandler) All(c echo.Context) error {
+	page, _ := strconv.Atoi(c.QueryParam("page"))
+    if page == 0 {
+		page = 1
+	}  
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	model, err := handler.{{ .Name }}Usecase.All(ctx, page)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+	return c.JSON(http.StatusOK, model)
+}
+
+// Delete{{ .Name }} removes a record from {{ .Name }} 
+func (handler *{{ .Name }}JSONHandler) Delete{{ .Name }}(c echo.Context) error {
+	uuid := c.Param("id")
+	id, err := strconv.ParseInt(uuid, 10, 64)
+	if err == nil {
+		return c.JSON(http.StatusBadRequest, ResponseError{Message: err.Error()})
+	}
+	ctx := c.Request().Context()
+	if ctx == nil {
+		ctx = context.Background()
+	}
+
+	err = handler.{{ .Name }}Usecase.Delete(ctx, id)
+	if err != nil {
+		return c.JSON(getStatusCode(err), ResponseError{Message: err.Error()})
+	}
+
+	return c.JSON(http.StatusOK, ResponseError{Message: "Deleted"})
+}
+
+
+func getStatusCode(err error) int {
+	if err == nil {
+		return http.StatusOK
+	}
+	switch err {
+	case domain.ErrInternalServerError:
+		return http.StatusInternalServerError
+	case domain.ErrNotFound:
+		return http.StatusNotFound
+	case domain.ErrConflict:
+		return http.StatusConflict
+	default:
+		return http.StatusInternalServerError
+	}
+}

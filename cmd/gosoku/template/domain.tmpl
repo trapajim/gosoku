@@ -1,0 +1,32 @@
+package domain
+
+import (
+	"context"
+	"time"
+)
+
+type {{ .Name }} struct {
+		ID        int64     `json:"id"`
+    {{ range .Fields }}{{ .Name }} {{ .TypeName }} `json:"{{ .JSONName }}" form:"{{.FormElement}},{{.FormElementAttributes}}"`    
+    {{ end }}
+		UpdatedAt time.Time `json:"updated_at"`
+		CreatedAt time.Time `json:"created_at"`
+}
+
+// {{ .Name }}Usecase represent the {{ .Name }} usecases
+type {{ .Name }}Usecase interface {
+	All(ctx context.Context, page int) (*[]{{ .Name }}, error)
+	GetByID(ctx context.Context, id int64) (*{{ .Name }}, error)
+	Update(ctx context.Context, ar *{{ .Name }}) error
+	Store(ctx context.Context,model *{{ .Name }}) error
+	Delete(ctx context.Context, id int64) error
+}
+
+// {{ .Name }}Repository represent the {{ .Name }} repository contract
+type {{ .Name }}Repository interface {
+	All(ctx context.Context, page int) (*[]{{ .Name }}, error)
+	GetByID(ctx context.Context, id int64) (*{{ .Name }}, error)
+	Update(ctx context.Context, ar *{{ .Name }}) error
+	Store(ctx context.Context, a *{{ .Name }}) error
+	Delete(ctx context.Context, id int64) error
+}
