@@ -27,14 +27,19 @@ var newCmd = &cobra.Command{
 	Short:   "creates a project directory of the name supplied as a parameter",
 	Example: `$ gosoku new myproject`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		projectName := ""
-		fmt.Print("Enter a Projectname (default gosoku):")
-		fmt.Scanln(&projectName)
-		if projectName == "" {
-			projectName = "gosoku"
-		}
+		projectName := scanProjectName()
 		return createProject(projectName)
 	},
+}
+
+func scanProjectName() string {
+	projectName := ""
+	fmt.Print("Enter a Projectname (default gosoku):")
+	fmt.Scanln(&projectName)
+	if projectName == "" {
+		projectName = "gosoku"
+	}
+	return projectName
 }
 
 func scanDatabaseData(projectName string) dBData {
