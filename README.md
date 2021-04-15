@@ -1,7 +1,6 @@
 # GOsoku
 
-Goal of this repository is to have an easy way to generate and administrate JSON API's with rails like generators. The Generated code should be modulary structured so a monolithic application could be easily refactored into an microservice approach.
-
+Goal of this repository is to have an easy way to generate and administrate JSON API's. 
 
 ## Commands
 
@@ -78,3 +77,10 @@ formbuilder.Build(domain.User{})
 // the generated form will have the values set from fields.
 formbuilder.Build(domain.User{Name:"Gosoku", Biography: "Test"})
 ```
+
+
+## todo 
+
+* [ ] sql migrations
+* [ ] admin dashboard
+* [ ] support for multiple datasources
