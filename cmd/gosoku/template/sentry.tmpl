@@ -1,0 +1,15 @@
+package sentry
+import(
+    "fmt"
+    "github.com/getsentry/sentry-go"
+	"github.com/spf13/viper"
+)
+
+func InitSentry() {
+    sentryDsn := viper.GetString(`sentry-dsn`)
+    if err := sentry.Init(sentry.ClientOptions{
+        Dsn: sentryDsn,
+    }); err != nil {
+        fmt.Printf("Sentry initialization failed: %v\n", err)
+    }
+}

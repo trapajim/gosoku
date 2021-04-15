@@ -15,8 +15,7 @@ var cfgFile string
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "gosoku",
-	Short: "Gosoku is an open-source server framework and CMS",
-	Long:  `Gosoku is a Fast and Flexible rails like server framework, to quickly setup JSON APIs with admin interface.`,
+	Short: "Gosoku is an open-source server framework to quickly bootstrap REST Api's",
 	Run: func(cmd *cobra.Command, args []string) {
 		// Do Stuff Here
 	},

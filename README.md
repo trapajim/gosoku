@@ -48,6 +48,17 @@ remove a generated type
     # this will remove domain/user.go, router/user.go and the user directory
 ```
 
+*sentry*
+add sentry and the sentry echo middleware
+
+see https://docs.sentry.io/platforms/go/guides/echo/ for more information 
+
+```bash
+    gosoku sentry
+    #or 
+    gosoku s
+```
+
 ## Formbuilder
 
 Forms can be automatically created based on struct tags.
