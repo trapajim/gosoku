@@ -97,3 +97,8 @@ func getBuilderFromTag(tag, value string) FormElementBuilder {
 
 	return DefaultBuilder{}
 }
+
+
+func TestMath() int {
+	return 1+2
+}
